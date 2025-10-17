@@ -1,0 +1,4 @@
+node_modules
+npm-debug.log
+back/Dockerfile
+docker-compose.yml

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: confiance-en-soi-front
+  namespace: confiance-sandrine-v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: confiance-en-soi-front
+  template:
+    metadata:
+      labels:
+        app: confiance-en-soi-front
+    spec:
+      containers:
+        - name: confiance-en-soi-front
+          image: confiance-en-soi-front:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: confiance-en-soi-front-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: confiance-en-soi-front
+spec:
+  selector:
+    app: confiance-en-soi-front
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: LoadBalancer  # Depuis l’extérieur du cluster :Utilise un tunnel ou un load balancer cloud pour exposer publiquement le service

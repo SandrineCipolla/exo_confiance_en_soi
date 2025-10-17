@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$/../.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/m2-confiance-en-soi-docker" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/m2-confiance-en-soi-docker/exo_confiance_en_soi" vcs="Git" />
+  </component>
+</project>

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: confiance-en-soi-front-config
+  namespace: confiance-sandrine-v1
+data:
+  VITE_API_URL: "http://127.0.0.1:55891"

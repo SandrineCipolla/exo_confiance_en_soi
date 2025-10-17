@@ -1,0 +1,47 @@
+services:
+  backend:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: confiance-en-soi-backend-container
+    env_file:
+      - .env
+    depends_on:
+      - db
+    environment:
+      MYSQL_HOST: db
+    ports:
+      - "${PORT_LOCAL}:${PORT_DOCKER}"
+    volumes:
+      - ./back:/usr/src/app
+      - /usr/src/app/node_modules
+
+  frontend:
+    build:
+      context: ./front/frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:8889
+    container_name: confiance-en-soi-frontend-container
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8889
+    volumes:
+      - ./front/frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - backend
+
+  db:
+    image: mariadb:11.8.3
+    container_name: m2-confiance-en-soi-docker-db-1
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MARIADB_DATABASE: ${DATABASE_NAME}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./back/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  mariadb_data:

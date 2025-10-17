@@ -1,0 +1,25 @@
+
+{
+  "name": "api-sample",
+  "version": "1.0.0",
+  "description": "A simple Node.js API that gives you confidence.",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon -L app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node.js",
+    "kubernetes"
+  ],
+  "author": "Laïla Atrmouh",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "mysql2": "^3.11.0",
+    "node-fetch": "2",
+    "sequelize": "^6.37.3",
+    "uuid": "8.3.2"
+  }
+}

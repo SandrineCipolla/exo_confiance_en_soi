@@ -1,0 +1,31 @@
+CREATE DATABASE IF NOT EXISTS confiance;
+
+USE confiance;
+
+CREATE TABLE IF NOT EXISTS quotes_fr (
+                                         id INT AUTO_INCREMENT PRIMARY KEY,
+                                         content VARCHAR(255) NOT NULL
+);
+
+INSERT INTO quotes_fr (content)
+VALUES
+    ('Je me fais confiance'),
+    ('J\'écoute mes intuitions'),
+    ('Les obstacles sont mes opportunités pour progresser'),
+    ('Ma santé mentale et physique sont prioritaires'),
+    ('J\'écoute les signaux de mon corps'),
+    ('J\'apprends tous les jours de moi-même'),
+    ('Je me dirige toujours vers la bonne direction'),
+    ('J\'ai droit au bonheur'),
+    ('Je suis bienveillant·e envers moi-même'),
+    ('J\'avance un pas après l\'autre'),
+    ('Ma paix intérieure irradie à l\'extérieur'),
+    ('Je célèbre chaque petit pas vers mes objectifs comme une victoire'),
+    ('Je trouve du bonheur dans les plaisirs simples de la vie'),
+    ('Je suis ouvert·e à recevoir toutes les formes d\'abondance qui m\'entourent'),
+    ('Je mérite d\'avoir une vie financière abondante'),
+    ('Je suis reconnaissant·e pour chaque aspect positif de ma vie'),
+    ('Les défis me rendent plus fort·e, et je les affronte avec détermination'),
+    ('Chaque jour, je découvre de nouvelles raisons de m\'aimer davantage'),
+    ('Mon potentiel est immense et je vais atteindre mes aspirations'),
+    ('Je crée ma réalité avec des pensées optimistes et pleines d\'espoir');
