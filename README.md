@@ -193,6 +193,54 @@ m2-confiance-en-soi-docker/
 
 ---
 
+## 🔄 CI/CD Pipeline
+
+Le projet utilise GitHub Actions pour automatiser les vérifications de qualité de code :
+
+### Pipeline automatique (déclenché sur push/PR)
+
+1. **Backend CI** :
+   - Installation des dépendances
+   - Vérification du formatage avec Prettier ❌ (bloquant)
+   - Vérification du lint avec ESLint ❌ (bloquant)
+
+2. **Frontend CI** :
+   - Installation des dépendances
+   - Vérification du formatage avec Prettier ❌ (bloquant)
+   - Vérification du lint avec ESLint ❌ (bloquant)
+   - Build du projet React
+
+3. **Docker Build** :
+   - Construction des images Docker backend et frontend
+   - (Uniquement si Backend CI et Frontend CI réussissent)
+
+### Commandes de développement
+
+Avant de commiter, vous pouvez vérifier localement :
+
+**Backend** :
+```bash
+cd m2-confiance-en-soi-docker/back
+npm run lint          # Vérifier ESLint
+npm run format:check  # Vérifier Prettier
+npm run format        # Corriger automatiquement le formatage
+```
+
+**Frontend** :
+```bash
+cd m2-confiance-en-soi-docker/front/frontend
+npm run lint          # Vérifier ESLint
+npm run format:check  # Vérifier Prettier
+npm run format        # Corriger automatiquement le formatage
+```
+
+**Tester le pipeline localement** (nécessite [act](https://github.com/nektos/act)) :
+```bash
+act push
+```
+
+---
+
 ## 🎯 URLs de l'application
 
 ### Docker Compose (Local)

@@ -21,12 +21,13 @@ services:
       context: ./front/frontend
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=http://localhost:8889
+        - VITE_API_URL=
     container_name: confiance-en-soi-frontend-container
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
-      - VITE_API_URL=http://localhost:8889
+      - VITE_API_URL=
+      - VITE_PROXY_TARGET=http://backend:8888
     volumes:
       - ./front/frontend:/usr/src/app
       - /usr/src/app/node_modules

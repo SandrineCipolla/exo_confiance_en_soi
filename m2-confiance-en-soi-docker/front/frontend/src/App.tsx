@@ -1,24 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
-
 
 export default function App() {
     const [quote, setQuote] = useState("");
     const [language, setLanguage] = useState<"fr" | "en" | null>(null);
     const [intervalId, setIntervalId] = useState<ReturnType<typeof setInterval> | null>(null);
 
-    const API_URL = import.meta.env.VITE_API_URL;
+    // Utiliser une URL relative pour profiter du proxy Vite
+    const API_URL = import.meta.env.VITE_API_URL || "";
 
-    async function fetchQuote(lang: "fr" | "en") {
-        try {
-            const res = await fetch(`${API_URL}/affirmation/${lang}`);
-            const data = await res.json();
-            setQuote(data.affirmation || "⚠️ Erreur lors du chargement...");
-        } catch (e) {
-            setQuote("❌ Impossible de récupérer la citation.");
-        }
-    }
+    const fetchQuote = useCallback(
+        async (lang: "fr" | "en") => {
+            try {
+                const res = await fetch(`${API_URL}/affirmation/${lang}`);
+                const data = await res.json();
+                setQuote(data.affirmation || "⚠️ Erreur lors du chargement...");
+            } catch {
+                setQuote("❌ Impossible de récupérer la citation.");
+            }
+        },
+        [API_URL]
+    );
 
     useEffect(() => {
         if (language) {
@@ -27,7 +29,7 @@ export default function App() {
             setIntervalId(id);
             return () => clearInterval(id);
         }
-    }, [language]);
+    }, [language, fetchQuote]);
 
     return (
         <div>

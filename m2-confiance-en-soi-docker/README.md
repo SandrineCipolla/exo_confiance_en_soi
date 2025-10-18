@@ -1,28 +1,43 @@
-# m2-confiance-en-soi-docker
+## 🛠️ Développement
 
-📦 Application Express (Node.js) à dockeriser !
+### CI/CD avec GitHub Actions
 
-## Comment démarrer le projet ?
+Le projet utilise un workflow CI/CD automatisé qui s'exécute à chaque push ou pull request. Le pipeline vérifie :
 
-- Cloner le projet sur son ordinateur
-- Se placer sur le dossier
-- `npm install`
-- `node app.js` pour démarrer le serveur
+**Stage 1 - Vérifications du code (en parallèle) :**
+- 📦 Installation des dépendances (backend et frontend)
+- 🔍 Vérification ESLint (qualité du code)
+- 🎨 Vérification Prettier (formatage)
+- 🏗️ Build du frontend React
 
-Tu devrais avoir le message suivant sur ton terminal
+**Stage 2 - Build Docker (si Stage 1 réussit) :**
+- 🐳 Construction de l'image Docker backend
+- 🐳 Construction de l'image Docker frontend
 
-```shell
-> node app.js
-Example app listening on port 8888
+**Stage 3 - Résumé :**
+- 📊 Rapport complet des résultats
+
+#### Tester le workflow localement avec `act`
+
+Vous pouvez tester le workflow CI/CD localement avant de pusher avec [act](https://github.com/nektos/act) :
+
+```bash
+# Prérequis : act installé (via Chocolatey, Homebrew, etc.)
+
+# Lister les jobs du workflow
+act -l
+
+# Exécuter le workflow complet (simule un push)
+act push
+
+# Exécuter seulement le job frontend
+act push -j frontend
+
+# Exécuter seulement le job backend
+act push -j backend
 ```
 
-Tu peux alors ouvrir sur un navigateur (ou [Postman](https://www.postman.com/) / [HTTPie](https://httpie.io/) / [Bruno](https://www.usebruno.com/) selon ta préférence) et accéder aux deux URLs suivantes :
+⚠️ **Note** : L'exécution avec `act` peut prendre plusieurs minutes car il télécharge les images Docker et installe toutes les dépendances.
 
-- http://localhost:8888/affirmation/en
-- http://localhost:8888/affirmation/fr
+### Modifier le code
 
-## A faire
-
-- Forker ce projet
-- Dockeriser cette application Express en créant un `Dockerfile` (et ne plus la lancer en faisant un `node app.js` depuis son ordinateur mais en faisant un `docker run`)
-- Remplacer la liste de citations codées en dur par une interaction avec une base de données (tu peux t'aider de [sequelize](https://sequelize.org/))

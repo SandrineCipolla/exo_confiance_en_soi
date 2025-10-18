@@ -1,88 +1,91 @@
 /* ==== GLOBAL THEME (dark mode) ==== */
 :root {
-  --bg-color: #121212;
-  --text-color: #f1f1f1;
-  --accent-color: #007bff;
-  --secondary-color: #6c757d;
-  --font-family: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
+    --bg-color: #121212;
+    --text-color: #f1f1f1;
+    --accent-color: #007bff;
+    --secondary-color: #6c757d;
+    --font-family: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-  font-family: var(--font-family);
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  text-align: center;
-  padding: 2rem;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 320px;
+    min-height: 100vh;
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    text-align: center;
+    padding: 2rem;
 }
 
 /* ==== TITLE ==== */
 h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
-  color: var(--accent-color);
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--accent-color);
 }
 
 /* ==== LANGUAGE CHOICE ==== */
 .language-choice p {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
 }
 
 .language-buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
 }
 
 /* ==== QUOTE ==== */
 .quote {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  max-width: 600px;
-  line-height: 1.4;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    max-width: 600px;
+    line-height: 1.4;
 }
 
 /* ==== BUTTONS ==== */
 button {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition:
+        background 0.3s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 button:hover {
-  transform: scale(1.05);
-  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.5);
+    transform: scale(1.05);
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.5);
 }
 
 button:active {
-  transform: scale(0.97);
+    transform: scale(0.97);
 }
 
 button.primary {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
 }
 
 button.primary:hover {
-  background: linear-gradient(135deg, #0056b3, #003c82);
+    background: linear-gradient(135deg, #0056b3, #003c82);
 }
 
 button.secondary {
-  background: linear-gradient(135deg, #6c757d, #4b4f52);
-  color: white;
+    background: linear-gradient(135deg, #6c757d, #4b4f52);
+    color: white;
 }
 
 button.secondary:hover {
-  background: linear-gradient(135deg, #5a5e62, #3c3f42);
+    background: linear-gradient(135deg, #5a5e62, #3c3f42);
 }
