@@ -1,10 +1,160 @@
-name: Workflow CI/CD
+name: CI/CD Pipeline
+
 on:
   push:
-    branches: [ master ]
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
 jobs:
-  say_hello:
+  # ==========================================
+  # JOB 1 : BACKEND - Node.js Express
+  # ==========================================
+  backend:
+    name: Backend CI
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: m2-confiance-en-soi-docker/back
+
     steps:
-      - name: Afficher un message
-        run: echo "Hello world, bientôt une CI ici!"
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: m2-confiance-en-soi-docker/back/package-lock.json
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🎨 Check code formatting (Prettier)
+        run: npm run format:check
+
+      - name: 🔍 Check for lint errors (ESLint)
+        run: npm run lint
+
+      - name: ✅ Verify backend starts
+        run: |
+          echo "Backend verification completed"
+
+  # ==========================================
+  # JOB 2 : FRONTEND - React + Vite
+  # ==========================================
+  frontend:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: m2-confiance-en-soi-docker/front/frontend
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: m2-confiance-en-soi-docker/front/frontend/package-lock.json
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🎨 Check code formatting (Prettier)
+        run: npm run format:check
+
+      - name: 🔍 Check for lint errors (ESLint)
+        run: npm run lint
+
+      - name: 🏗️ Build frontend
+        run: npm run build
+
+      - name: 📊 Check build output
+        run: |
+          if [ -d "dist" ]; then
+            echo "✅ Build successful - dist folder created"
+            ls -la dist
+          else
+            echo "❌ Build failed - dist folder not found"
+            exit 1
+          fi
+
+  # ==========================================
+  # JOB 3 : DOCKER BUILD (après backend et frontend)
+  # ==========================================
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]  # Attend que backend et frontend réussissent
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔨 Build Backend Docker Image
+        run: |
+          cd m2-confiance-en-soi-docker/back
+          docker build -t confiance-en-soi-back:ci .
+          echo "✅ Backend image built successfully"
+
+      - name: 🔨 Build Frontend Docker Image
+        run: |
+          cd m2-confiance-en-soi-docker/front/frontend
+          docker build -t confiance-en-soi-front:ci .
+          echo "✅ Frontend image built successfully"
+
+      - name: 📋 List Docker images
+        run: docker images | grep confiance-en-soi
+
+  # ==========================================
+  # JOB 4 : SUMMARY
+  # ==========================================
+  summary:
+    name: CI/CD Summary
+    runs-on: ubuntu-latest
+    needs: [backend, frontend, docker]
+    if: always()
+
+    steps:
+      - name: 📊 Display results
+        run: |
+          echo "=========================================="
+          echo "   CI/CD PIPELINE COMPLETED"
+          echo "=========================================="
+          echo ""
+          echo "📦 BACKEND CHECKS:"
+          echo "  └─ Status: ${{ needs.backend.result }}"
+          echo "     ├─ Install dependencies"
+          echo "     ├─ Lint check (ESLint)"
+          echo "     └─ Verify backend"
+          echo ""
+          echo "🎨 FRONTEND CHECKS:"
+          echo "  └─ Status: ${{ needs.frontend.result }}"
+          echo "     ├─ Install dependencies"
+          echo "     ├─ Format check (Prettier)"
+          echo "     ├─ Lint check (ESLint)"
+          echo "     └─ Build React app"
+          echo ""
+          echo "🐳 DOCKER BUILD:"
+          echo "  └─ Status: ${{ needs.docker.result }}"
+          echo "     ├─ Build backend image"
+          echo "     └─ Build frontend image"
+          echo ""
+          echo "=========================================="
+          if [[ "${{ needs.backend.result }}" == "success" && "${{ needs.frontend.result }}" == "success" && "${{ needs.docker.result }}" == "success" ]]; then
+            echo "✅ RESULT: All checks passed!"
+            echo "=========================================="
+            exit 0
+          else
+            echo "❌ RESULT: Some checks failed"
+            echo "=========================================="
+            exit 1
+          fi

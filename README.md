@@ -187,7 +187,6 @@ m2-confiance-en-soi-docker/
 
 ## 📝 Notes importantes
 
-- **Ne commitez jamais le fichier `.env`** (il contient des mots de passe)
 - Les images Docker doivent être reconstruites après chaque modification du code pour Kubernetes
 - Minikube ne persiste pas les images Docker après un `minikube stop`, d'où l'utilité du script `redeploy_k8s.bat`
 - Le port 3001 a été choisi pour éviter les conflits avec d'autres services locaux
