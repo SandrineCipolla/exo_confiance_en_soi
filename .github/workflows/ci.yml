@@ -2,13 +2,13 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ master, main ]
+    branches: [ "*" ]
   pull_request:
-    branches: [ master, main ]
+    branches: [ master]
 
 jobs:
   # ==========================================
-  # JOB 1 : BACKEND - Node.js Express
+  # JOB 1 : BACKEND - Build + tests (via Docker)
   # ==========================================
   backend:
     name: Backend CI
@@ -21,28 +21,34 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: m2-confiance-en-soi-docker/back/package-lock.json
+      - name: 🛠️ Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: 📦 Install dependencies
-        run: npm ci
+      - name: 🐳 Build Backend Docker Image (for tests)
+        run: |
+          docker build -t confiance-en-soi-back:test -f Dockerfile .
+          echo "✅ Backend test image built successfully"
+
+      - name: 🐳 Run Backend Tests inside Docker
+        run: |
+          docker run --rm confiance-en-soi-back:test npm run coverage
+
+      - name: 📈 Upload coverage report
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: m2-confiance-en-soi-docker/back/coverage
 
       - name: 🎨 Check code formatting (Prettier)
-        run: npm run format:check
+        run: docker run --rm confiance-en-soi-back:test npm run format:check
 
       - name: 🔍 Check for lint errors (ESLint)
-        run: npm run lint
+        run: docker run --rm confiance-en-soi-back:test npm run lint
 
-      - name: ✅ Verify backend starts
-        run: |
-          echo "Backend verification completed"
 
   # ==========================================
-  # JOB 2 : FRONTEND - React + Vite
+  # JOB 2 : FRONTEND - React + Build
   # ==========================================
   frontend:
     name: Frontend CI
@@ -84,43 +90,56 @@ jobs:
             exit 1
           fi
 
+      - name: 🐳 Build Frontend Docker Image (for future deploy)
+        run: |
+          docker build -t confiance-en-soi-front:ci -f m2-confiance-en-soi-docker/front/frontend/Dockerfile m2-confiance-en-soi-docker/front/frontend
+          echo "✅ Frontend Docker image built successfully"
+
   # ==========================================
-  # JOB 3 : DOCKER BUILD (après backend et frontend)
+  # JOB 3 : DEPLOY COVERAGE REPORT (GitHub Pages)
   # ==========================================
-  docker:
-    name: Docker Build
+  deploy-coverage:
+    name: Deploy Coverage Report (GitHub Pages)
     runs-on: ubuntu-latest
-    needs: [backend, frontend]  # Attend que backend et frontend réussissent
+    needs: [backend]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    concurrency:
+      group: 'coverage-pages'
+      cancel-in-progress: true
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🐳 Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: ⚙️ Setup Pages
+        uses: actions/configure-pages@v4
 
-      - name: 🔨 Build Backend Docker Image
-        run: |
-          cd m2-confiance-en-soi-docker/back
-          docker build -t confiance-en-soi-back:ci .
-          echo "✅ Backend image built successfully"
+      - name: 📤 Upload coverage artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: m2-confiance-en-soi-docker/back/coverage
 
-      - name: 🔨 Build Frontend Docker Image
-        run: |
-          cd m2-confiance-en-soi-docker/front/frontend
-          docker build -t confiance-en-soi-front:ci .
-          echo "✅ Frontend image built successfully"
-
-      - name: 📋 List Docker images
-        run: docker images | grep confiance-en-soi
+      - name: 🚀 Deploy coverage report to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
   # ==========================================
-  # JOB 4 : SUMMARY
+  # JOB 4: SUMMARY
   # ==========================================
   summary:
     name: CI/CD Summary
     runs-on: ubuntu-latest
-    needs: [backend, frontend, docker]
+    needs: [backend, frontend]
     if: always()
 
     steps:
@@ -132,24 +151,19 @@ jobs:
           echo ""
           echo "📦 BACKEND CHECKS:"
           echo "  └─ Status: ${{ needs.backend.result }}"
-          echo "     ├─ Install dependencies"
-          echo "     ├─ Lint check (ESLint)"
-          echo "     └─ Verify backend"
+          echo "     ├─ Docker build"
+          echo "     ├─ Tests (Vitest)"
+          echo "     ├─ Lint (ESLint)"
+          echo "     └─ Format (Prettier)"
           echo ""
           echo "🎨 FRONTEND CHECKS:"
           echo "  └─ Status: ${{ needs.frontend.result }}"
-          echo "     ├─ Install dependencies"
-          echo "     ├─ Format check (Prettier)"
-          echo "     ├─ Lint check (ESLint)"
-          echo "     └─ Build React app"
-          echo ""
-          echo "🐳 DOCKER BUILD:"
-          echo "  └─ Status: ${{ needs.docker.result }}"
-          echo "     ├─ Build backend image"
-          echo "     └─ Build frontend image"
+          echo "     ├─ Build (Vite)"
+          echo "     ├─ Lint + Prettier"
+          echo "     └─ Docker build"
           echo ""
           echo "=========================================="
-          if [[ "${{ needs.backend.result }}" == "success" && "${{ needs.frontend.result }}" == "success" && "${{ needs.docker.result }}" == "success" ]]; then
+          if [[ "${{ needs.backend.result }}" == "success" && "${{ needs.frontend.result }}" == "success" ]]; then
             echo "✅ RESULT: All checks passed!"
             echo "=========================================="
             exit 0
