@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "A simple Node.js API that gives you confidence.",
   "main": "app.js",
+  "type": "module",
   "scripts": {
     "start": "nodemon -L app.js",
     "test": "vitest",
-    "lint": "eslint .",
+    "lint": "eslint . --config eslint.config.cjs",
     "format": "prettier --write \"**/*.js\"",
     "format:check": "prettier --check \"**/*.js\"",
     "coverage": "vitest run --coverage"
