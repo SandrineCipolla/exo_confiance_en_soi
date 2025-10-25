@@ -9,7 +9,7 @@ on:
 jobs:
   # ==========================================
   # JOB 1 : BACKEND - Build + tests (via Docker)
-  # ==========================================
+  #==========================================
   backend:
     name: Backend CI
     runs-on: ubuntu-latest
@@ -29,37 +29,32 @@ jobs:
           docker build -t confiance-en-soi-back:test -f Dockerfile .
           echo "✅ Backend test image built successfully"
 
-      - name: 🐳 Run Backend Tests inside Docker
+      - name: 🐳 Run Backend Tests inside Docker (with coverage)
         run: |
-          mkdir -p m2-confiance-en-soi-docker/back/coverage
+          mkdir -p m2-confiance-en-soi-docker/back/coverage/tmp
           docker run --rm \
-            -v ${{ github.workspace }}/m2-confiance-en-soi-docker/back/coverage:/usr/src/app/coverage \
+            -v ${{ github.workspace }}/m2-confiance-en-soi-docker/back/coverage/tmp:/usr/src/app/coverage/tmp \
             confiance-en-soi-back:test npm run coverage
 
-
-      - name: 🐳 Copy coverage report from Docker container
-        run:
-          container_id=$(docker create confiance-en-soi-back:test)
-            docker cp $container_id:/usr/src/app/coverage ./m2-confiance-en-soi-docker/back/coverage || echo "No coverage found"
-            docker rm $container_id
-
-      - name: 🕵️ List downloaded files
+      - name: 🕵️ List coverage files (debug)
+        if: always()
         run: |
-          echo "Listing current directory:"
-          ls -R .
+          echo "Listing coverage output:"
+          ls -la m2-confiance-en-soi-docker/back/coverage/tmp || echo "⚠️ No coverage found"
 
       - name: 📈 Upload coverage report
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage
-          path: m2-confiance-en-soi-docker/back/coverage
+          path: m2-confiance-en-soi-docker/back/coverage/tmp
 
       - name: 🎨 Check code formatting (Prettier)
         run: docker run --rm confiance-en-soi-back:test npm run format:check
 
       - name: 🔍 Check for lint errors (ESLint)
         run: docker run --rm confiance-en-soi-back:test npm run lint
+
 
 
   # ==========================================
