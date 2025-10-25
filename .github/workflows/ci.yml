@@ -31,15 +31,12 @@ jobs:
 
       - name: 🐳 Run Backend Tests inside Docker (with coverage)
         run: |
+          echo "🧪 Running tests with coverage in container..."
           docker run --name confiance-back-test \
-          confiance-en-soi-back:test npm run coverage
+          confiance-en-soi-back:test sh -c "npm run coverage && echo '✅ Coverage completed' && ls -la coverage/ && echo '📂 Contents of tmp:' && ls -laR coverage/tmp/"
 
           echo "📦 Copying coverage results from container..."
-          docker cp confiance-back-test:/usr/src/app/coverage ./coverage || {
-            echo "❌ Failed to copy coverage from container"
-            docker logs confiance-back-test
-            exit 1
-          }
+          docker cp confiance-back-test:/usr/src/app/coverage . || echo "❌ Failed to copy coverage"
           docker rm confiance-back-test
 
       - name: 🕵️ List coverage contents (debug)
@@ -53,17 +50,31 @@ jobs:
           echo "📂 Listing coverage directory contents:"
           ls -la coverage/ || echo "❌ coverage/ not found"
           echo ""
-          echo "📂 Listing coverage/output (if exists):"
-          ls -la coverage/output/ || echo "❌ coverage/output/ not found"
-          echo ""
           echo "📂 Full tree of coverage:"
           find coverage -type f || echo "❌ No files in coverage"
+
+      - name: 📦 Copy coverage to workspace root
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/coverage-report
+          # Check if HTML files are in coverage/tmp or coverage directly
+          if [ -d "coverage/tmp" ] && [ -f "coverage/tmp/index.html" ]; then
+            echo "📂 HTML files found in coverage/tmp, copying from there..."
+            cp -r coverage/tmp/* $GITHUB_WORKSPACE/coverage-report/
+          elif [ -f "coverage/index.html" ]; then
+            echo "📂 HTML files found in coverage root, copying from there..."
+            cp -r coverage/* $GITHUB_WORKSPACE/coverage-report/
+          else
+            echo "❌ No HTML files found!"
+            exit 1
+          fi
+          echo "✅ Coverage files copied to workspace root"
+          ls -la $GITHUB_WORKSPACE/coverage-report/
 
       - name: 📈 Upload coverage report
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage
-          path: coverage
+          path: coverage-report
           if-no-files-found: error
 
       - name: 🎨 Check code formatting (Prettier)
@@ -154,10 +165,23 @@ jobs:
           name: backend-coverage
           path: coverage
 
+      - name: 🕵️ Verify coverage files
+        run: |
+          echo "📂 Coverage directory contents:"
+          ls -la coverage/
+          echo ""
+          echo "📄 Checking for index.html:"
+          if [ -f "coverage/index.html" ]; then
+            echo "✅ index.html found!"
+          else
+            echo "❌ index.html NOT found!"
+            exit 1
+          fi
+
       - name: ⚙️ Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: 📤 Upload coverage artifact
+      - name: 📤 Upload coverage artifact to Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: coverage
