@@ -31,28 +31,29 @@ jobs:
 
       - name: 🐳 Run Backend Tests inside Docker (with coverage)
         run: |
-          mkdir -p m2-confiance-en-soi-docker/back/coverage
+          mkdir -p coverage
           docker run --name confiance-back-test \
           confiance-en-soi-back:test npm run coverage || true
 
           echo "📦 Copying coverage results from container..."
-          docker cp confiance-back-test:/usr/src/app/coverage m2-confiance-en-soi-docker/back/
+          docker cp confiance-back-test:/usr/src/app/coverage ./
           docker rm confiance-back-test || true
 
       - name: 🕵️ List coverage contents (debug)
         run: |
           echo "📂 Listing coverage directory contents:"
-          ls -la m2-confiance-en-soi-docker/back/coverage || true
+          ls -la coverage || true
           echo ""
           echo "📂 Listing coverage/output (if exists):"
-          ls -la m2-confiance-en-soi-docker/back/coverage/output || true
+          ls -la coverage/output || true
 
       - name: 📈 Upload coverage report
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage
-          path: m2-confiance-en-soi-docker/back/coverage/output
+          path: coverage/output
+          if-no-files-found: error
 
       - name: 🎨 Check code formatting (Prettier)
         run: docker run --rm confiance-en-soi-back:test npm run format:check
