@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "description": "A simple Node.js API that gives you confidence.",
   "main": "app.js",
+  "type": "module",
   "scripts": {
     "start": "nodemon -L app.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint .",
+    "test": "vitest",
+    "lint": "eslint . --config eslint.config.cjs",
     "format": "prettier --write \"**/*.js\"",
-    "format:check": "prettier --check \"**/*.js\""
+    "format:check": "prettier --check \"**/*.js\"",
+    "coverage": "vitest run --coverage"
   },
   "keywords": [
     "node.js",
@@ -25,8 +27,10 @@
     "uuid": "8.3.2"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^4.0.2",
     "eslint": "^9.38.0",
     "globals": "^16.4.0",
-    "prettier": "^3.6.2"
+    "prettier": "^3.6.2",
+    "vitest": "^4.0.2"
   }
 }
