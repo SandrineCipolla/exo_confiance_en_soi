@@ -31,28 +31,39 @@ jobs:
 
       - name: 🐳 Run Backend Tests inside Docker (with coverage)
         run: |
-          mkdir -p coverage
           docker run --name confiance-back-test \
-          confiance-en-soi-back:test npm run coverage || true
+          confiance-en-soi-back:test npm run coverage
 
           echo "📦 Copying coverage results from container..."
-          docker cp confiance-back-test:/usr/src/app/coverage ./
-          docker rm confiance-back-test || true
+          docker cp confiance-back-test:/usr/src/app/coverage ./coverage || {
+            echo "❌ Failed to copy coverage from container"
+            docker logs confiance-back-test
+            exit 1
+          }
+          docker rm confiance-back-test
 
       - name: 🕵️ List coverage contents (debug)
         run: |
+          echo "📂 Current directory:"
+          pwd
+          echo ""
+          echo "📂 Listing all files:"
+          ls -la
+          echo ""
           echo "📂 Listing coverage directory contents:"
-          ls -la coverage || true
+          ls -la coverage/ || echo "❌ coverage/ not found"
           echo ""
           echo "📂 Listing coverage/output (if exists):"
-          ls -la coverage/output || true
+          ls -la coverage/output/ || echo "❌ coverage/output/ not found"
+          echo ""
+          echo "📂 Full tree of coverage:"
+          find coverage -type f || echo "❌ No files in coverage"
 
       - name: 📈 Upload coverage report
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage
-          path: coverage/output
+          path: coverage
           if-no-files-found: error
 
       - name: 🎨 Check code formatting (Prettier)
