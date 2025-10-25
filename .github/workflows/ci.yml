@@ -31,7 +31,22 @@ jobs:
 
       - name: 🐳 Run Backend Tests inside Docker
         run: |
-          docker run --rm confiance-en-soi-back:test npm run coverage
+          mkdir -p m2-confiance-en-soi-docker/back/coverage
+          docker run --rm \
+            -v ${{ github.workspace }}/m2-confiance-en-soi-docker/back/coverage:/usr/src/app/coverage \
+            confiance-en-soi-back:test npm run coverage
+
+
+      - name: 🐳 Copy coverage report from Docker container
+        run:
+          container_id=$(docker create confiance-en-soi-back:test)
+            docker cp $container_id:/usr/src/app/coverage ./m2-confiance-en-soi-docker/back/coverage || echo "No coverage found"
+            docker rm $container_id
+
+      - name: 🕵️ List downloaded files
+        run: |
+          echo "Listing current directory:"
+          ls -R .
 
       - name: 📈 Upload coverage report
         if: success()
@@ -122,10 +137,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: ⚙️ Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
 
       - name: 📤 Upload coverage artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: m2-confiance-en-soi-docker/back/coverage
 
