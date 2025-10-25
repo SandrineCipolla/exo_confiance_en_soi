@@ -92,7 +92,7 @@ jobs:
 
       - name: 🐳 Build Frontend Docker Image (for future deploy)
         run: |
-          docker build -t confiance-en-soi-front:ci -f -f Dockerfile .
+          docker build -t confiance-en-soi-front:ci -f Dockerfile .
           echo "✅ Frontend Docker image built successfully"
 
   # ==========================================
