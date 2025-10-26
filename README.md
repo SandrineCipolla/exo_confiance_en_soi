@@ -8,7 +8,34 @@
 - **Frontend** : React + Vite avec TypeScript
 - **Base de données** : MariaDB 11.8.3
 - **Déploiement local** : Docker Compose
-- **Déploiement "prod"** : Kubernetes avec Minikube
+- **Déploiement Kubernetes local** : Minikube
+- **Déploiement production** : Azure Kubernetes Service (AKS)
+
+---
+
+## 🌐 Application en production sur Azure
+
+**🔗 URL publique : http://20.216.193.148**
+
+L'application est déployée sur **Azure Kubernetes Service (AKS)** avec :
+- ✅ Haute disponibilité
+- ✅ Persistance des données (PersistentVolume 1Gi)
+- ✅ IP publique accessible depuis Internet
+- ✅ Cluster : France Central, Kubernetes v1.32.7
+
+### Redéployer sur Azure AKS
+
+```bash
+deploy_aks.bat
+```
+
+### Récupérer l'URL Azure
+
+```bash
+kubectl get service confiance-en-soi-front -n confiance-sandrine-v1
+```
+
+📖 **[Documentation complète du déploiement AKS](m2-confiance-en-soi-docker/README.md)**
 
 ---
 
