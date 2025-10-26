@@ -200,7 +200,8 @@ Le projet utilise GitHub Actions pour automatiser les vérifications de qualité
 ### Pipeline automatique (déclenché sur push/PR)
 
 1. **Backend CI** :
-   - Installation des dépendances
+   - Build de l'image Docker
+   - Exécution des tests avec couverture de code
    - Vérification du formatage avec Prettier ❌ (bloquant)
    - Vérification du lint avec ESLint ❌ (bloquant)
 
@@ -209,10 +210,11 @@ Le projet utilise GitHub Actions pour automatiser les vérifications de qualité
    - Vérification du formatage avec Prettier ❌ (bloquant)
    - Vérification du lint avec ESLint ❌ (bloquant)
    - Build du projet React
+   - Build de l'image Docker
 
-3. **Docker Build** :
-   - Construction des images Docker backend et frontend
-   - (Uniquement si Backend CI et Frontend CI réussissent)
+3. **Coverage Report** (uniquement sur master) :
+   - Déploiement automatique du rapport de couverture sur GitHub Pages
+   - 📊 **[Voir le rapport de couverture](https://sandrinecipolla.github.io/exo_confiance_en_soi/)**
 
 ### Commandes de développement
 
