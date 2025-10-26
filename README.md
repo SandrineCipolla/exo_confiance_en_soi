@@ -34,17 +34,43 @@ L'application est déployée sur **Azure Kubernetes Service (AKS)** avec :
 
 **IMPORTANT** : Pour économiser de l'argent, arrêtez le cluster quand vous ne l'utilisez pas !
 
-**Arrêter le cluster** (coût : ~0.02€/jour au lieu de ~2-3€/jour) :
-- **Windows PowerShell** : Clic droit sur `stop_aks.ps1` → "Exécuter avec PowerShell"
-- Ou en ligne de commande : `.\stop_aks.ps1`
-- Ou ancien script cmd : `stop_aks.bat`
+#### **Démarrer le cluster** (2-3 minutes, avant une démo)
 
-**Démarrer le cluster** (2-3 minutes, avant une démo) :
-- **Windows PowerShell** : Clic droit sur `start_aks.ps1` → "Exécuter avec PowerShell"
-- Ou en ligne de commande : `.\start_aks.ps1`
-- Ou ancien script cmd : `start_aks.bat`
+**Méthode 1 - Explorateur Windows (le plus simple)** :
+1. Ouvrez l'explorateur de fichiers
+2. Allez dans le dossier du projet
+3. **Clic droit** sur `start_aks.ps1`
+4. Cliquez sur **"Exécuter avec PowerShell"**
+5. ✅ Une fenêtre s'ouvre avec l'URL en couleur !
 
-Le script affichera automatiquement l'URL publique en couleur.
+**Méthode 2 - Terminal PowerShell** :
+```powershell
+# Depuis le dossier du projet
+.\start_aks.ps1
+```
+
+**Méthode 3 - Commandes manuelles** :
+```powershell
+az aks start --resource-group confiance-en-soi --name confiance
+kubectl get service confiance-en-soi-front -n confiance-sandrine-v1
+```
+
+#### **Arrêter le cluster** (économie : ~0.02€/jour au lieu de ~2-3€/jour)
+
+**Méthode 1 - Explorateur Windows** :
+- **Clic droit** sur `stop_aks.ps1` → "Exécuter avec PowerShell"
+
+**Méthode 2 - Terminal PowerShell** :
+```powershell
+.\stop_aks.ps1
+```
+
+**Méthode 3 - Commande manuelle** :
+```powershell
+az aks stop --resource-group confiance-en-soi --name confiance
+```
+
+💡 **Astuce** : Les scripts PowerShell (`.ps1`) affichent l'URL automatiquement en couleur et restent ouverts pour que vous puissiez lire les informations.
 
 ### Redéployer sur Azure AKS
 
