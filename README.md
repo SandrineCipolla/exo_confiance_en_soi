@@ -35,16 +35,16 @@ L'application est déployée sur **Azure Kubernetes Service (AKS)** avec :
 **IMPORTANT** : Pour économiser de l'argent, arrêtez le cluster quand vous ne l'utilisez pas !
 
 **Arrêter le cluster** (coût : ~0.02€/jour au lieu de ~2-3€/jour) :
-```bash
-stop_aks.bat
-```
+- **Windows PowerShell** : Clic droit sur `stop_aks.ps1` → "Exécuter avec PowerShell"
+- Ou en ligne de commande : `.\stop_aks.ps1`
+- Ou ancien script cmd : `stop_aks.bat`
 
 **Démarrer le cluster** (2-3 minutes, avant une démo) :
-```bash
-start_aks.bat
-```
+- **Windows PowerShell** : Clic droit sur `start_aks.ps1` → "Exécuter avec PowerShell"
+- Ou en ligne de commande : `.\start_aks.ps1`
+- Ou ancien script cmd : `start_aks.bat`
 
-Le script affichera automatiquement l'URL publique.
+Le script affichera automatiquement l'URL publique en couleur.
 
 ### Redéployer sur Azure AKS
 
@@ -221,8 +221,10 @@ m2-confiance-en-soi-docker/
 │   └── 08-service_frontend.yaml
 ├── compose.yaml               # Configuration Docker Compose (local)
 ├── deploy_aks.bat            # Script de déploiement Azure AKS
-├── start_aks.bat             # Script de démarrage du cluster AKS (économies)
-├── stop_aks.bat              # Script d'arrêt du cluster AKS (économies)
+├── start_aks.ps1             # Script PowerShell de démarrage du cluster AKS ⭐
+├── stop_aks.ps1              # Script PowerShell d'arrêt du cluster AKS ⭐
+├── start_aks.bat             # Script cmd de démarrage (alternative)
+├── stop_aks.bat              # Script cmd d'arrêt (alternative)
 ├── redeploy_k8s.bat          # Script de déploiement Kubernetes Minikube
 └── README.md                 # Ce fichier
 ```
