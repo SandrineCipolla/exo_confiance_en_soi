@@ -31,44 +31,21 @@ jobs:
 
       - name: 🐳 Run Backend Tests inside Docker (with coverage)
         run: |
-          echo "🧪 Running tests with coverage in container..."
           docker run --name confiance-back-test \
-          confiance-en-soi-back:test sh -c "npm run coverage && echo '✅ Coverage completed' && ls -la coverage/ && echo '📂 Contents of tmp:' && ls -laR coverage/tmp/"
+          confiance-en-soi-back:test npm run coverage
 
-          echo "📦 Copying coverage results from container..."
-          docker cp confiance-back-test:/usr/src/app/coverage . || echo "❌ Failed to copy coverage"
+          docker cp confiance-back-test:/usr/src/app/coverage .
           docker rm confiance-back-test
 
-      - name: 🕵️ List coverage contents (debug)
-        run: |
-          echo "📂 Current directory:"
-          pwd
-          echo ""
-          echo "📂 Listing all files:"
-          ls -la
-          echo ""
-          echo "📂 Listing coverage directory contents:"
-          ls -la coverage/ || echo "❌ coverage/ not found"
-          echo ""
-          echo "📂 Full tree of coverage:"
-          find coverage -type f || echo "❌ No files in coverage"
-
-      - name: 📦 Copy coverage to workspace root
+      - name: 📦 Prepare coverage for upload
         run: |
           mkdir -p $GITHUB_WORKSPACE/coverage-report
-          # Check if HTML files are in coverage/tmp or coverage directly
+          # Copy HTML files from coverage/tmp if they exist there, otherwise from coverage root
           if [ -d "coverage/tmp" ] && [ -f "coverage/tmp/index.html" ]; then
-            echo "📂 HTML files found in coverage/tmp, copying from there..."
             cp -r coverage/tmp/* $GITHUB_WORKSPACE/coverage-report/
-          elif [ -f "coverage/index.html" ]; then
-            echo "📂 HTML files found in coverage root, copying from there..."
-            cp -r coverage/* $GITHUB_WORKSPACE/coverage-report/
           else
-            echo "❌ No HTML files found!"
-            exit 1
+            cp -r coverage/* $GITHUB_WORKSPACE/coverage-report/
           fi
-          echo "✅ Coverage files copied to workspace root"
-          ls -la $GITHUB_WORKSPACE/coverage-report/
 
       - name: 📈 Upload coverage report
         uses: actions/upload-artifact@v4
@@ -165,23 +142,10 @@ jobs:
           name: backend-coverage
           path: coverage
 
-      - name: 🕵️ Verify coverage files
-        run: |
-          echo "📂 Coverage directory contents:"
-          ls -la coverage/
-          echo ""
-          echo "📄 Checking for index.html:"
-          if [ -f "coverage/index.html" ]; then
-            echo "✅ index.html found!"
-          else
-            echo "❌ index.html NOT found!"
-            exit 1
-          fi
-
       - name: ⚙️ Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: 📤 Upload coverage artifact to Pages
+      - name: 📤 Upload coverage to Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: coverage
@@ -202,30 +166,16 @@ jobs:
     steps:
       - name: 📊 Display results
         run: |
-          echo "=========================================="
-          echo "   CI/CD PIPELINE COMPLETED"
-          echo "=========================================="
-          echo ""
-          echo "📦 BACKEND CHECKS:"
-          echo "  └─ Status: ${{ needs.backend.result }}"
-          echo "     ├─ Docker build"
-          echo "     ├─ Tests (Vitest)"
-          echo "     ├─ Lint (ESLint)"
-          echo "     └─ Format (Prettier)"
-          echo ""
-          echo "🎨 FRONTEND CHECKS:"
-          echo "  └─ Status: ${{ needs.frontend.result }}"
-          echo "     ├─ Build (Vite)"
-          echo "     ├─ Lint + Prettier"
-          echo "     └─ Docker build"
-          echo ""
-          echo "=========================================="
+          echo "CI/CD Pipeline Summary"
+          echo "======================"
+          echo "Backend:  ${{ needs.backend.result }}"
+          echo "Frontend: ${{ needs.frontend.result }}"
+          echo "======================"
+
           if [[ "${{ needs.backend.result }}" == "success" && "${{ needs.frontend.result }}" == "success" ]]; then
-            echo "✅ RESULT: All checks passed!"
-            echo "=========================================="
+            echo "✅ All checks passed!"
             exit 0
           else
-            echo "❌ RESULT: Some checks failed"
-            echo "=========================================="
+            echo "❌ Some checks failed"
             exit 1
           fi
