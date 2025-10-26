@@ -22,6 +22,13 @@ L'application est déployée sur **Azure Kubernetes Service (AKS)** avec :
 - ✅ Persistance des données (PersistentVolume 1Gi)
 - ✅ IP publique accessible depuis Internet
 - ✅ Cluster : France Central, Kubernetes v1.32.7
+- ✅ Namespace : confiance-sandrine-v1
+
+### Architecture du déploiement AKS
+
+- **Frontend** : React + Vite (LoadBalancer public sur port 80)
+- **Backend** : Node.js + Express API (ClusterIP interne sur port 8888)
+- **Base de données** : MariaDB 11.8.3 avec PersistentVolume (1Gi, stockage Azure)
 
 ### Redéployer sur Azure AKS
 
@@ -29,13 +36,39 @@ L'application est déployée sur **Azure Kubernetes Service (AKS)** avec :
 deploy_aks.bat
 ```
 
+Ce script va automatiquement :
+1. Builder les images Docker (backend et frontend)
+2. Pousser les images vers Docker Hub
+3. Appliquer les configurations Kubernetes (dossier `k8s-aks/`)
+4. Redémarrer les deployments
+
 ### Récupérer l'URL Azure
 
+Voir tous les services :
 ```bash
 kubectl get service confiance-en-soi-front -n confiance-sandrine-v1
 ```
 
-📖 **[Documentation complète du déploiement AKS](m2-confiance-en-soi-docker/README.md)**
+Ou uniquement l'IP publique :
+```bash
+kubectl get service confiance-en-soi-front -n confiance-sandrine-v1 -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
+
+### Vérifier l'état du déploiement
+
+```bash
+# Voir les pods
+kubectl get pods -n confiance-sandrine-v1
+
+# Voir les logs du backend
+kubectl logs -l app=confiance-en-soi-back -n confiance-sandrine-v1 --tail=50
+
+# Voir les logs du frontend
+kubectl logs -l app=confiance-en-soi-front -n confiance-sandrine-v1 --tail=50
+
+# Voir le stockage persistant
+kubectl get pvc -n confiance-sandrine-v1
+```
 
 ---
 
@@ -149,7 +182,7 @@ m2-confiance-en-soi-docker/
 │   ├── start.sh              # Script de démarrage
 │   ├── vite.config.ts        # Configuration Vite avec proxy
 │   └── package.json
-├── k8s/                       # Configurations Kubernetes (ordre d'application)
+├── k8s/                       # Configurations Kubernetes Minikube (local)
 │   ├── 01-namespace.yaml
 │   ├── 02-back-configmap.yaml
 │   ├── 03-front-configmap.yaml
@@ -158,9 +191,21 @@ m2-confiance-en-soi-docker/
 │   ├── 06-deployment_frontend.yaml
 │   ├── 07-service_backend.yaml
 │   └── 08-service_frontend.yaml
-├── compose.yaml               # Configuration Docker Compose
-├── redeploy_k8s.bat          # Script de déploiement Kubernetes
-└── README.md
+├── k8s-aks/                   # Configurations Kubernetes Azure AKS (production)
+│   ├── 01-namespace.yaml
+│   ├── 02-back-configmap.yaml
+│   ├── 03-front-configmap.yaml
+│   ├── 03.5-mariadb-initdb-configmap.yaml    # Script SQL d'initialisation
+│   ├── 03.6-mariadb-pvc.yaml                  # PersistentVolumeClaim (1Gi)
+│   ├── 04-mariadb.yaml
+│   ├── 05-deployment_backend.yaml
+│   ├── 06-deployment_frontend.yaml
+│   ├── 07-service_backend.yaml
+│   └── 08-service_frontend.yaml
+├── compose.yaml               # Configuration Docker Compose (local)
+├── deploy_aks.bat            # Script de déploiement Azure AKS
+├── redeploy_k8s.bat          # Script de déploiement Kubernetes Minikube
+└── README.md                 # Ce fichier
 ```
 
 ---
@@ -272,6 +317,11 @@ act push
 
 ## 🎯 URLs de l'application
 
+### Azure AKS (Production)
+- **Application complète** : **http://20.216.193.148**
+  - Affirmations FR : http://20.216.193.148/affirmation/fr
+  - Affirmations EN : http://20.216.193.148/affirmation/en
+
 ### Docker Compose (Local)
 - **Application complète** : http://localhost:3001
 - **Backend uniquement** : http://localhost:8889
@@ -279,7 +329,7 @@ act push
   - Affirmations FR : http://localhost:8889/affirmation/fr
   - Affirmations EN : http://localhost:8889/affirmation/en
 
-### Kubernetes (Minikube)
+### Kubernetes Minikube (Local)
 - **Application complète** : http://127.0.0.1
 - **Backend uniquement** : http://192.168.49.2:30888
   - Route test : http://192.168.49.2:30888/
