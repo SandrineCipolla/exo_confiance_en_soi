@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-env
+  namespace: confiance-sandrine-v1
+data:
+  MARIADB_ROOT_PASSWORD: "example"
+  MARIADB_DATABASE: "confiance"
+  MYSQL_HOST: "db"
+  MYSQL_USER: "root"
+  MYSQL_PASSWORD: "example"
+  DATABASE_NAME: "confiance"

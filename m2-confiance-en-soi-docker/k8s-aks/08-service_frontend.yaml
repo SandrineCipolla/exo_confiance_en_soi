@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: confiance-en-soi-front-external
+  namespace: confiance-sandrine-v1
+spec:
+  selector:
+    app: confiance-en-soi-front
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30300
+  type: NodePort # Depuis la machine hôte (node) : Expose le service sur un port spécifique de chaque nœud du cluster

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: confiance-en-soi-front-config
+  namespace: confiance-sandrine-v1
+data:
+  VITE_API_URL: ""
+  VITE_PROXY_TARGET: "http://confiance-en-soi-back:8888"

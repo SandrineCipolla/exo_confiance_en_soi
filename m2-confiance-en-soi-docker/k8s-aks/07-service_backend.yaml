@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: confiance-en-soi-back-external
+  namespace: confiance-sandrine-v1
+spec:
+  selector:
+    app: confiance-en-soi-back
+  ports:
+    - port: 8888
+      targetPort: 8888
+      nodePort: 30888
+  type: NodePort

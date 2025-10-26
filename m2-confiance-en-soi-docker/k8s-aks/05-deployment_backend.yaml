@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: confiance-en-soi-back
+  namespace: confiance-sandrine-v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: confiance-en-soi-back
+  template:
+    metadata:
+      labels:
+        app: confiance-en-soi-back
+    spec:
+      containers:
+        - name: backend
+          image: sancci/confiance-en-soi-back:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8888
+          envFrom:
+            - configMapRef:
+                name: mariadb-env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: confiance-en-soi-back
+  namespace: confiance-sandrine-v1
+spec:
+  selector:
+    app: confiance-en-soi-back
+  ports:
+    - port: 8888
+      targetPort: 8888
+  type: ClusterIP # Seulement à l'intérieur du cluster: Le service est accessible uniquement par d'autres pods dans le cluster Kubernetes
